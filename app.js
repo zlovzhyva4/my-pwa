@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+  let selectedTaskIndex = null;
+  const currentTaskEl = document.getElementById('current-task');
+  
   const main = document.getElementById('main-container');
   const tasksScreen = document.getElementById('tasks-container');
 
@@ -12,25 +16,59 @@ document.addEventListener('DOMContentLoaded', () => {
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
   function renderTasks() {
-    list.innerHTML = '';
+  list.innerHTML = '';
 
-    tasks.forEach((task, index) => {
-      const li = document.createElement('li');
-      li.textContent = task;
+  tasks.forEach((task, index) => {
+    const li = document.createElement('li');
 
-      const removeBtn = document.createElement('button');
-      removeBtn.textContent = '−';
+    // 🔘 Радіо-кнопка вибору задачі
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'selected-task';
+    radio.checked = index === selectedTaskIndex;
 
-      removeBtn.addEventListener('click', () => {
-        tasks.splice(index, 1);
-        saveTasks();
-        renderTasks();
-      });
-
-      li.appendChild(removeBtn);
-      list.appendChild(li);
+    radio.addEventListener('change', () => {
+      selectedTaskIndex = index;
+      currentTaskEl.textContent = task;
+      resetTimer();
+      renderTasks();
     });
-  }
+
+    // 📝 Назва задачі
+    const span = document.createElement('span');
+    span.textContent = task;
+    span.style.flexGrow = '1';
+
+    // ❌ Кнопка видалення
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '−';
+    removeBtn.onclick = () => {
+      tasks.splice(index, 1);
+
+      if (selectedTaskIndex === index) {
+        selectedTaskIndex = null;
+        currentTaskEl.textContent = '—';
+        resetTimer();
+      } else if (selectedTaskIndex > index) {
+        selectedTaskIndex--;
+      }
+
+      saveTasks();
+      renderTasks();
+    };
+
+    // ✨ Підсвітка вибраної задачі
+    if (index === selectedTaskIndex) {
+      li.classList.add('selected');
+    }
+
+    li.appendChild(radio);
+    li.appendChild(span);
+    li.appendChild(removeBtn);
+    list.appendChild(li);
+  });
+}
+
 
   function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
