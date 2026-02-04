@@ -150,6 +150,17 @@ document.addEventListener('DOMContentLoaded', () => {
   stopBtn.addEventListener('click', stopTimer);
   resetBtn.addEventListener('click', resetTimer);
 
+// ===== Coins =====
+let coins = 0; // початкове значення
+const coinsEl = document.getElementById('coins-count');
+
+function updateCoinsUI() {
+  coinsEl.textContent = coins;
+}
+
+// Показуємо одразу при завантаженні
+updateCoinsUI();
+
   // === Перший рендер ===
   renderTasks();
   updateTimerUI();

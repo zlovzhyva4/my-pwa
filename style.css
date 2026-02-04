@@ -97,6 +97,17 @@ li button:hover {
   object-fit: cover; /* щоб картинка не спотворювалась */
 }
 
+#avatar-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* відступ між аватаром і coins */
+}
+
+#coins-container {
+  font-weight: bold;
+  color: gold;
+}
+
 li.selected {
   background-color: #ffd700;
 }
