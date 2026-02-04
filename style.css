@@ -1,3 +1,4 @@
+/* === Базові стилі === */
 html, body {
   margin: 0;
   padding: 0;
@@ -15,30 +16,15 @@ body {
   align-items: center;
 }
 
+/* Заголовки */
 .container h1 {
   font-size: 2em;
   text-align: center;
-}
-
-button {
   margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1em;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  background-color: #1e90ff;
-  color: white;
-  transition: background-color 0.2s;
 }
 
-button:hover {
-  background-color: #0b78e3;
-}
-
-/* кнопки Tasks */
+/* Кнопки */
 button {
-  margin-top: 10px;
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
@@ -53,14 +39,57 @@ button:hover {
   background-color: #0b78e3;
 }
 
-/* список задач */
-ul {
-  list-style-type: none;
+/* === Аватар зліва зверху === */
+#avatar-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+#avatar-container img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover;
+}
+
+/* === Coins справа зверху === */
+#coins-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-weight: bold;
+  color: gold;
+  z-index: 1000;
+}
+
+/* === Кнопка Tasks по центру екрану === */
+#show-tasks-btn {
+  display: block;
+  margin: 50px auto 0 auto; /* зверху відступ, по центру */
+}
+
+/* === Контейнери сторінок === */
+#main-container, #tasks-container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#tasks-container {
+  display: none; /* спочатку ховаємо */
+}
+
+/* === Список задач === */
+#tasks-list {
+  list-style: none;
   padding: 0;
   margin-top: 10px;
 }
 
-li {
+#tasks-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,48 +99,51 @@ li {
   margin-bottom: 8px;
 }
 
-li button {
+/* Підсвітка вибраної задачі */
+#tasks-list li.selected {
+  background-color: #ffd700;
+}
+
+/* Кнопка видалення задачі */
+#tasks-list li button {
   background-color: #ff4d4f;
   padding: 4px 8px;
   font-size: 0.9em;
 }
 
-li button:hover {
+#tasks-list li button:hover {
   background-color: #d9363e;
 }
 
-#avatar-container {
-  position: absolute; /* щоб аватар був зверху поверх контенту */
-  top: 10px;
-  left: 10px;
-  width: 100px;
-  height: 100px;
-  z-index: 1000; /* завжди поверх іншого */
-}
-
-#avatar-container img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%; /* круглий аватар */
-  border: 3px solid #fff; /* контур, щоб видно */
-  object-fit: cover; /* щоб картинка не спотворювалась */
-}
-
-#avatar-container {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* відступ між аватаром і coins */
-}
-
-#coins-container {
-  font-weight: bold;
-  color: gold;
-}
-
-li.selected {
-  background-color: #ffd700;
-}
-
-li input[type="radio"] {
+/* Радіо кнопки */
+#tasks-list li input[type="radio"] {
   margin-right: 10px;
+}
+
+/* === Pomodoro таймер === */
+#pomodoro {
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#pomodoro button {
+  margin-right: 5px;
+}
+
+/* === Адаптивність === */
+@media (max-width: 500px) {
+  #avatar-container img {
+    width: 70px;
+    height: 70px;
+  }
+
+  #coins-container {
+    font-size: 0.9em;
+  }
+
+  button {
+    padding: 8px 16px;
+    font-size: 0.9em;
+  }
 }

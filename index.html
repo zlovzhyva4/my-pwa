@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
-
-  <!-- iOS PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <title>Мій PWA</title>
@@ -23,41 +20,48 @@
 
 <body>
 
+  <!-- Coins зліва -->
+  <div id="coins-container">
+    Coins: <span id="coins-count">0</span>
+  </div>
+
+  <!-- Аватар справа -->
+  <div id="avatar-container">
+    <img src="images/avatar.png" alt="Avatar" id="avatar">
+  </div>
+
   <div class="container" id="main-container">
-    
-    <div id="avatar-container">
-  <img src="images/avatar.png" alt="Avatar" id="avatar">
-  <div id="coins-container"></div>
-  Coins: <span id="coins-count">0</span>
-  </div>
-</div>
-    
-    <h1>Привіт! Це PWA</h1>
+    <!-- Кнопка Tasks по центру -->
     <button id="show-tasks-btn">Tasks</button>
+
+    <h1>Привіт! Це PWA</h1>
   </div>
 
- <div class="container" id="tasks-container" style="display: none;">
-  <h1>Tasks</h1>
+  <!-- Екран задач / Pomodoro -->
+  <div class="container" id="tasks-container" style="display: none;">
+    <h1>Tasks</h1>
 
-  <div class="task-input">
-    <input type="text" id="new-task" placeholder="Нова задача">
-    <button id="add-task-btn">+</button>
+    <div class="task-input">
+      <input type="text" id="new-task" placeholder="Нова задача">
+      <button id="add-task-btn">+</button>
+    </div>
+
+    <ul id="tasks-list"></ul>
+
+    <!-- Pomodoro таймер -->
+    <div id="pomodoro">
+      <h2>Pomodoro</h2>
+      <div>Задача: <span id="current-task">—</span></div>
+      <div id="timer">25:00</div>
+
+      <button id="start-btn">Start</button>
+      <button id="stop-btn">Stop</button>
+      <button id="reset-btn">Reset</button>
+    </div>
+
+    <button id="back-btn">Назад</button>
   </div>
-
-  <div id="pomodoro">
-  <h3>Вибрана задача: <span id="current-task">—</span></h3>
-  <div id="timer">25:00</div>
-  <button id="start-btn">▶ Start</button>
-  <button id="stop-btn">⏸ Stop</button>
-  <button id="reset-btn">⟳ Reset</button>
-</div>
-
-  <ul id="tasks-list"></ul>
-
-  <button id="back-btn">Назад</button>
-</div>
 
   <script src="app.js"></script>
 </body>
-
 </html>
