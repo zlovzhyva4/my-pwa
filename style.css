@@ -96,3 +96,11 @@ li button:hover {
   border: 3px solid #fff; /* контур, щоб видно */
   object-fit: cover; /* щоб картинка не спотворювалась */
 }
+
+li.selected {
+  background-color: #ffd700;
+}
+
+li input[type="radio"] {
+  margin-right: 10px;
+}
