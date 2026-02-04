@@ -117,28 +117,35 @@ function updateTimerDisplay() {
 
 // Start / Stop / Reset
 function startTimer() {
-  if (interval || selectedTaskIndex === null) return;
-  interval = setInterval(() => {
-    if (timerSeconds > 0) {
-      timerSeconds--;
-      updateTimerDisplay();
-    } else {
-      clearInterval(interval);
-      interval = null;
-      alert(`Час Pomodoro для "${tasks[selectedTaskIndex]}" закінчився!`);
+  if (timer) return;
+
+  if (selectedTaskIndex === null) {
+    alert('Спочатку вибери задачу');
+    return;
+  }
+
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      timer = null;
+      alert('Pomodoro завершено 🍅');
     }
   }, 1000);
 }
 
 function stopTimer() {
-  clearInterval(interval);
-  interval = null;
+  clearInterval(timer);
+  timer = null;
 }
 
 function resetTimer() {
-  stopTimer();
-  timerSeconds = 25 * 60;
-  updateTimerDisplay();
+  clearInterval(timer);
+  timer = null;
+  timeLeft = 25 * 60;
+  updateTimerUI();
 }
 
 // Додаємо радіо-кнопку при рендері задач
