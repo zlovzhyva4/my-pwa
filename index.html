@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <title>Мій PWA</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- iPhone іконка -->
+  <link rel="apple-touch-icon" href="images/icon-180.png">
+
+  <!-- Стилі -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Привіт! Це PWA</h1>
+    <a href="tasks.html"><button>Tasks</button></a>
+  </div>
+
+   <div class="container" id="tasks-container" style="display: none;">
+    <h1>Tasks</h1>
+    <input type="text" id="new-task" placeholder="Нова задача">
+    <button id="add-task-btn">+</button>
+    <ul id="tasks-list"></ul>
+    <button id="back-btn">Назад</button>
+  </div>
+
+  <!-- Скрипт -->
+  <script src="app.js"></script>
+</body>
+</html>
