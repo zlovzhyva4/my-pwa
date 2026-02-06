@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tasks.push({
       text: value,
-      done: false
+      done: false,
       timeSpent: 0
     });
 
