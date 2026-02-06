@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === СТАН ===
   let selectedTaskIndex = null;
   let timer = null;
-  let timeLeft = 25 * 60;
+  let timeLeft = 1 * 60;
 
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (timeLeft <= 0) {
         clearInterval(timer);
         timer = null;
+        tasks[selectedTaskIndex].timeSpent += 1;
+  saveTasks();
+  renderTasks();
         alert('Pomodoro завершено 🍅');
       }
     }, 1000);
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetTimer() {
     clearInterval(timer);
     timer = null;
-    timeLeft = 25 * 60;
+    timeLeft = 1 * 60;
     updateTimerUI();
   }
 
@@ -102,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // text
       const span = document.createElement('span');
-      span.textContent = task.text;
+      span.textContent = `${task.text} (${task.timeSpent} хв)`;
       span.style.flexGrow = '1';
 
       // done
@@ -149,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tasks.push({
       text: value,
       done: false
+      timeSpent: 0
     });
 
     input.value = '';
