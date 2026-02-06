@@ -1,40 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // === Глобальні змінні ===
+  // === СТАН ===
   let selectedTaskIndex = null;
-  const currentTaskEl = document.getElementById('current-task');
-
-  // Таймер Pomodoro
   let timer = null;
   let timeLeft = 25 * 60;
+
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+  // === DOM ===
+  const main = document.getElementById('main-container');
+  const tasksScreen = document.getElementById('tasks-container');
+
+  const showBtn = document.getElementById('show-tasks-btn');
+  const backBtn = document.getElementById('back-btn');
+
+  const input = document.getElementById('new-task');
+  const addBtn = document.getElementById('add-task-btn');
+  const list = document.getElementById('tasks-list');
+
+  const currentTaskEl = document.getElementById('current-task');
   const timerEl = document.getElementById('timer');
   const startBtn = document.getElementById('start-btn');
   const stopBtn = document.getElementById('stop-btn');
   const resetBtn = document.getElementById('reset-btn');
 
-  // Елементи екрану задач
-  const main = document.getElementById('main-container');
-  const tasksScreen = document.getElementById('tasks-container');
-  const showBtn = document.getElementById('show-tasks-btn');
-  const backBtn = document.getElementById('back-btn');
+  // === COINS ===
+  let coins = 0;
+  const coinsEl = document.getElementById('coins-count');
 
-  // Додавання задач
-  const input = document.getElementById('new-task');
-  const addBtn = document.getElementById('add-task-btn');
-  const list = document.getElementById('tasks-list');
+  function updateCoinsUI() {
+    coinsEl.textContent = coins;
+  }
 
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-  // === Функції ===
-
+  // === STORAGE ===
   function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
+  // === TIMER ===
   function updateTimerUI() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
-    timerEl.textContent = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    timerEl.textContent =
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
   function startTimer() {
@@ -69,13 +77,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTimerUI();
   }
 
+  // === TASKS ===
   function renderTasks() {
     list.innerHTML = '';
 
     tasks.forEach((task, index) => {
       const li = document.createElement('li');
 
-      // Радіо-кнопка для вибору задачі
+      if (task.done) li.classList.add('done');
+      if (index === selectedTaskIndex) li.classList.add('selected');
+
+      // radio
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = 'selected-task';
@@ -83,17 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       radio.addEventListener('change', () => {
         selectedTaskIndex = index;
-        currentTaskEl.textContent = task;
+        currentTaskEl.textContent = task.text;
         resetTimer();
         renderTasks();
       });
 
-      // Назва задачі
+      // text
       const span = document.createElement('span');
-      span.textContent = task;
+      span.textContent = task.text;
       span.style.flexGrow = '1';
 
-      // Кнопка видалення
+      // done
+      const doneBtn = document.createElement('button');
+      doneBtn.textContent = '✓';
+      doneBtn.onclick = () => {
+        task.done = !task.done;
+        saveTasks();
+        renderTasks();
+      };
+
+      // remove
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '−';
       removeBtn.onclick = () => {
@@ -111,26 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTasks();
       };
 
-      // Підсвітка вибраної задачі
-      if (index === selectedTaskIndex) {
-        li.classList.add('selected');
-      } else {
-        li.classList.remove('selected');
-      }
-
       li.appendChild(radio);
       li.appendChild(span);
+      li.appendChild(doneBtn);
       li.appendChild(removeBtn);
+
       list.appendChild(li);
     });
   }
 
-  // === Обробники кнопок ===
+  // === EVENTS ===
   addBtn.addEventListener('click', () => {
     const value = input.value.trim();
     if (!value) return;
 
-    tasks.push(value);
+    tasks.push({
+      text: value,
+      done: false
+    });
+
     input.value = '';
     saveTasks();
     renderTasks();
@@ -150,18 +170,8 @@ document.addEventListener('DOMContentLoaded', () => {
   stopBtn.addEventListener('click', stopTimer);
   resetBtn.addEventListener('click', resetTimer);
 
-// ===== Coins =====
-let coins = 0; // початкове значення
-const coinsEl = document.getElementById('coins-count');
-
-function updateCoinsUI() {
-  coinsEl.textContent = coins;
-}
-
-// Показуємо одразу при завантаженні
-updateCoinsUI();
-
-  // === Перший рендер ===
+  // === INIT ===
+  updateCoinsUI();
   renderTasks();
   updateTimerUI();
 
