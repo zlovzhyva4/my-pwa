@@ -14,11 +14,12 @@ html, body {
 }
 
 body {
-  background: url('images/bg.jpg') no-repeat center center fixed;
-  background-size: cover;
+  background-color: #c3c3c3;
+  margin: 0;
+  padding-bottom: 60px; /* місце для Bottom Navigation */
   font-family: 'TahomaCustom', Tahoma, sans-serif;
   font-size: 8px;
-  color: white;
+  color: black;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -69,14 +70,9 @@ button:hover {
   top: 10px;
   right: 10px;
   font-weight: bold;
-  color: gold;
+  font-size: 1.4em;
+  color: black;
   z-index: 1000;
-}
-
-/* === Кнопка Tasks по центру екрану === */
-#show-tasks-btn {
-  display: block;
-  margin: 50px auto 0 auto; /* зверху відступ, по центру */
 }
 
 /* === Контейнери сторінок === */
@@ -88,6 +84,39 @@ button:hover {
 
 #tasks-container {
   display: none; /* спочатку ховаємо */
+}
+
+/* Поле coin у формі додавання задачі */
+.task-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.task-input #new-task {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-size: 1em;
+}
+
+.task-coin-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 1em;
+}
+
+.task-coin-label input {
+  width: 56px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-size: 1em;
 }
 
 /* === Список задач === */
@@ -110,6 +139,39 @@ button:hover {
 /* Підсвітка вибраної задачі */
 #tasks-list li.selected {
   background-color: #ffd700;
+}
+
+/* Виконана задача — чітко видно */
+#tasks-list li.done {
+  background-color: rgba(0, 80, 0, 0.4);
+  opacity: 0.9;
+}
+
+#tasks-list li.done .task-text {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Кнопка "Готово" */
+#tasks-list li .task-done-btn {
+  background-color: #2e7d32;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 0.9em;
+}
+
+#tasks-list li .task-done-btn:hover {
+  background-color: #1b5e20;
+}
+
+#tasks-list li .task-done-btn.is-done {
+  background-color: #1b5e20;
+  font-weight: bold;
+  cursor: default;
+}
+
+#tasks-list li .task-done-btn.is-done:hover {
+  background-color: #1b5e20;
 }
 
 /* Кнопка видалення задачі */
@@ -135,8 +197,47 @@ button:hover {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+#pomodoro #timer {
+  font-size: 32px;
+}
+
 #pomodoro button {
   margin-right: 5px;
+}
+
+/* === Bottom Navigation === */
+#bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  padding: 0 16px;
+}
+
+#bottom-nav #home-btn,
+#bottom-nav #show-tasks-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 40px;
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#bottom-nav #home-btn:hover,
+#bottom-nav #show-tasks-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* === Адаптивність === */
@@ -147,7 +248,7 @@ button:hover {
   }
 
   #coins-container {
-    font-size: 0.9em;
+    font-size: 1.2em;
   }
 
   button {

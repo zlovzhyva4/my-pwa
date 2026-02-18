@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === СТАН ===
   let selectedTaskIndex = null;
   let timer = null;
-  let timeLeft = 1 * 60;
+  let timeLeft = 25 * 60;
 
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -12,9 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const tasksScreen = document.getElementById('tasks-container');
 
   const showBtn = document.getElementById('show-tasks-btn');
-  const backBtn = document.getElementById('back-btn');
+  const homeBtn = document.getElementById('home-btn');
 
   const input = document.getElementById('new-task');
+  const coinsInput = document.getElementById('new-task-coins');
   const addBtn = document.getElementById('add-task-btn');
   const list = document.getElementById('tasks-list');
 
@@ -25,11 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetBtn = document.getElementById('reset-btn');
 
   // === COINS ===
-  let coins = 0;
+  const COINS_STORAGE_KEY = 'pwa-coins';
+  let coins = parseInt(localStorage.getItem(COINS_STORAGE_KEY), 10) || 0;
   const coinsEl = document.getElementById('coins-count');
 
   function updateCoinsUI() {
     coinsEl.textContent = coins;
+  }
+
+  function saveCoins() {
+    localStorage.setItem(COINS_STORAGE_KEY, String(coins));
   }
 
   // === STORAGE ===
@@ -76,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetTimer() {
     clearInterval(timer);
     timer = null;
-    timeLeft = 1 * 60;
+    timeLeft = 25 * 60;
     updateTimerUI();
   }
 
@@ -104,15 +110,29 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // text
+      const taskCoins = task.coins != null ? task.coins : 0;
       const span = document.createElement('span');
-      span.textContent = `${task.text} (${task.timeSpent} хв)`;
+      span.className = 'task-text';
+      span.textContent = `${task.text} (${task.timeSpent} хв)${taskCoins ? ` · ${taskCoins} coin${taskCoins !== 1 ? 's' : ''}` : ''}`;
       span.style.flexGrow = '1';
 
       // done
       const doneBtn = document.createElement('button');
-      doneBtn.textContent = '✓';
-      doneBtn.onclick = () => {
+      doneBtn.type = 'button';
+      doneBtn.className = 'task-done-btn' + (task.done ? ' is-done' : '');
+      doneBtn.textContent = task.done ? '✓ Виконано' : 'Готово';
+      doneBtn.onclick = (e) => {
+        e.stopPropagation();
+        const wasDone = task.done;
         task.done = !task.done;
+        const alreadyAwarded = task.coinsAwarded === true;
+        if (!wasDone && task.done && !alreadyAwarded) {
+          const toAdd = task.coins != null ? task.coins : 0;
+          coins += toAdd;
+          task.coinsAwarded = true;
+          saveCoins();
+          updateCoinsUI();
+        }
         saveTasks();
         renderTasks();
       };
@@ -149,13 +169,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const value = input.value.trim();
     if (!value) return;
 
+    const coinCount = Math.max(0, parseInt(coinsInput.value, 10) || 0);
+
     tasks.push({
       text: value,
       done: false,
-      timeSpent: 0
+      timeSpent: 0,
+      coins: coinCount
     });
 
     input.value = '';
+    coinsInput.value = '0';
     saveTasks();
     renderTasks();
   });
@@ -165,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     tasksScreen.style.display = 'block';
   });
 
-  backBtn.addEventListener('click', () => {
+  homeBtn.addEventListener('click', () => {
     tasksScreen.style.display = 'none';
     main.style.display = 'block';
   });

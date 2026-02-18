@@ -32,8 +32,6 @@
 
   <div class="container" id="main-container">
     <h1>hi losers</h1>
-    <!-- Кнопка Tasks по центру -->
-    <button id="show-tasks-btn">Tasks</button>
   </div>
 
   <!-- Екран задач / Pomodoro -->
@@ -52,13 +50,20 @@
 
     <div class="task-input">
       <input type="text" id="new-task" placeholder="Нова задача">
+      <label class="task-coin-label">
+        Coin: <input type="number" id="new-task-coins" min="0" value="0" placeholder="0">
+      </label>
       <button id="add-task-btn">+</button>
     </div>
 
     <ul id="tasks-list"></ul>
-
-    <button id="back-btn">Назад</button>
   </div>
+
+  <!-- Bottom Navigation (на всіх екранах) -->
+  <nav id="bottom-nav">
+    <button type="button" id="home-btn" aria-label="Головна">Home</button>
+    <button type="button" id="show-tasks-btn" aria-label="Задачі">Tasks</button>
+  </nav>
 
   <script src="app.js"></script>
 </body>
