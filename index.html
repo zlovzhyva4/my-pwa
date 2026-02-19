@@ -36,20 +36,19 @@
 
   <!-- Екран задач / Pomodoro -->
   <div class="container" id="tasks-container" style="display: none;">
-    <h1>Tasks</h1>
-
-      <!-- Pomodoro таймер -->
+    <!-- Pomodoro таймер по центру -->
     <div id="pomodoro">
       <div>Задача: <span id="current-task">—</span></div>
       <div id="timer">25:00</div>
-
-      <button id="start-btn">Start</button>
-      <button id="stop-btn">Stop</button>
-      <button id="reset-btn">Reset</button>
+      <div class="pomodoro-buttons">
+        <button id="start-btn">Start</button>
+        <button id="stop-btn">Stop</button>
+        <button id="reset-btn">Reset</button>
+      </div>
     </div>
 
     <div class="task-input">
-      <input type="text" id="new-task" placeholder="Нова задача">
+      <input type="text" id="new-task" placeholder="New task">
       <label class="task-coin-label">
         Coin: <input type="number" id="new-task-coins" min="0" value="0" placeholder="0">
       </label>

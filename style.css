@@ -51,8 +51,8 @@ button:hover {
 /* === Аватар зліва зверху === */
 #avatar-container {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: calc(10px + env(safe-area-inset-top));
+  left: calc(10px + env(safe-area-inset-left));
   z-index: 1000;
 }
 
@@ -67,8 +67,8 @@ button:hover {
 /* === Coins справа зверху === */
 #coins-container {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: calc(10px + env(safe-area-inset-top));
+  right: calc(10px + env(safe-area-inset-right));
   font-weight: bold;
   font-size: 1.4em;
   color: black;
@@ -86,6 +86,59 @@ button:hover {
   display: none; /* спочатку ховаємо */
 }
 
+#tasks-container #pomodoro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 0;
+  padding: 20px 10px;
+  border-top: none;
+}
+
+#tasks-container #pomodoro > div {
+  margin-bottom: 8px;
+}
+
+#tasks-container #pomodoro .pomodoro-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Кнопки таймера — стиль Windows 98 */
+#tasks-container #pomodoro .pomodoro-buttons button {
+  background: #c0c0c0;
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 11px;
+  padding: 5px 14px;
+  border: 2px solid;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #000;
+  min-height: 23px;
+}
+
+#tasks-container #pomodoro .pomodoro-buttons button:hover {
+  background: #d4d4d4;
+}
+
+#tasks-container #pomodoro .pomodoro-buttons button:active {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3);
+  padding: 6px 13px 4px 15px; /* візуально "вдавлена" кнопка */
+}
+
 /* Поле coin у формі додавання задачі */
 .task-input {
   display: flex;
@@ -95,99 +148,204 @@ button:hover {
   margin-bottom: 8px;
 }
 
+/* Поле "Нова задача" — стиль Windows 98 (inset) */
 .task-input #new-task {
   flex: 1;
   min-width: 120px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.2);
+  padding: 6px 8px;
+  border: 2px solid;
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
   font-size: 16px; /* ≥16px щоб iOS не зумовував при фокусі */
+  outline: none;
 }
 
+.task-input #new-task::placeholder {
+  color: #808080;
+}
+
+/* Поле Coin — стиль Windows 98 */
 .task-coin-label {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 1em;
+  gap: 6px;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 11px;
+  color: #000;
 }
 
 .task-coin-label input {
   width: 56px;
   padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(0,0,0,0.2);
-  font-size: 16px; /* ≥16px щоб iOS не зумовував при фокусі */
+  border: 2px solid;
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+
+/* Кнопка "+" — стиль Windows 98 */
+.task-input #add-task-btn {
+  background: #c0c0c0;
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 14px;
+  min-width: 36px;
+  border: 2px solid;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #000;
+  min-height: 23px;
+}
+
+.task-input #add-task-btn:hover {
+  background: #d4d4d4;
+}
+
+.task-input #add-task-btn:active {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3);
+  padding: 6px 13px 4px 15px;
 }
 
 /* === Список задач === */
+/* === Список задач — стиль Windows 98 === */
 #tasks-list {
   list-style: none;
-  padding: 0;
+  padding: 8px;
   margin-top: 10px;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  border-radius: 0;
 }
 
 #tasks-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(0,0,0,0.5);
-  padding: 8px 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  background: #c0c0c0;
+  padding: 6px 10px;
+  border: 1px solid #808080;
+  border-radius: 0;
+  margin-bottom: 6px;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 11px;
+  color: #000;
 }
 
-/* Підсвітка вибраної задачі */
+#tasks-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Підсвітка вибраної задачі (Win98 — синій фон) */
 #tasks-list li.selected {
-  background-color: #ffd700;
+  background: #0a246a;
+  color: #fff;
+  border-color: #0a246a;
 }
 
-/* Виконана задача — чітко видно */
+#tasks-list li.selected .task-text {
+  color: #fff;
+}
+
+/* Виконана задача */
 #tasks-list li.done {
-  background-color: rgba(0, 80, 0, 0.4);
-  opacity: 0.9;
+  background: #c0c0c0;
+  opacity: 0.85;
 }
 
 #tasks-list li.done .task-text {
   text-decoration: line-through;
-  color: rgba(255, 255, 255, 0.85);
+  color: #808080;
 }
 
-/* Кнопка "Готово" */
-#tasks-list li .task-done-btn {
-  background-color: #2e7d32;
-  color: #fff;
-  padding: 6px 10px;
-  font-size: 0.9em;
+#tasks-list li.done.selected .task-text {
+  color: rgba(255, 255, 255, 0.9);
 }
 
-#tasks-list li .task-done-btn:hover {
-  background-color: #1b5e20;
+/* Текст задачі */
+#tasks-list li .task-text {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+/* Кнопки в списку — стиль Windows 98 */
+#tasks-list li .task-done-btn,
+#tasks-list li button {
+  background: #c0c0c0;
+  color: #000;
+  font-family: "MS Sans Serif", "Segoe UI", Tahoma, sans-serif;
+  font-size: 11px;
+  padding: 4px 10px;
+  min-height: 20px;
+  border: 2px solid;
+  border-top-color: #fff;
+  border-left-color: #fff;
+  border-right-color: #808080;
+  border-bottom-color: #808080;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 #000;
+}
+
+#tasks-list li .task-done-btn:hover,
+#tasks-list li button:hover {
+  background: #d4d4d4;
+}
+
+#tasks-list li .task-done-btn:active,
+#tasks-list li button:active {
+  border-top-color: #808080;
+  border-left-color: #808080;
+  border-right-color: #fff;
+  border-bottom-color: #fff;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3);
+  padding: 5px 9px 3px 11px;
 }
 
 #tasks-list li .task-done-btn.is-done {
-  background-color: #1b5e20;
-  font-weight: bold;
+  background: #808080;
+  color: #fff;
+  border-top-color: #404040;
+  border-left-color: #404040;
+  border-right-color: #c0c0c0;
+  border-bottom-color: #c0c0c0;
   cursor: default;
 }
 
 #tasks-list li .task-done-btn.is-done:hover {
-  background-color: #1b5e20;
-}
-
-/* Кнопка видалення задачі */
-#tasks-list li button {
-  background-color: #ff4d4f;
-  padding: 4px 8px;
-  font-size: 0.9em;
-}
-
-#tasks-list li button:hover {
-  background-color: #d9363e;
+  background: #808080;
 }
 
 /* Радіо кнопки */
 #tasks-list li input[type="radio"] {
-  margin-right: 10px;
+  margin-right: 8px;
+  accent-color: #0a246a;
 }
 
 /* === Pomodoro таймер === */
@@ -201,8 +359,8 @@ button:hover {
   font-size: 32px;
 }
 
-#pomodoro button {
-  margin-right: 5px;
+#tasks-container #pomodoro .pomodoro-buttons button {
+  margin: 0;
 }
 
 /* === Bottom Navigation === */
@@ -211,8 +369,10 @@ button:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 56px;
-  padding: 0 16px;
+  min-height: 56px;
+  padding: 12px 16px;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
   padding-bottom: max(12px, env(safe-area-inset-bottom));
   background-color: rgba(0, 0, 0, 0.85);
   display: flex;
@@ -220,7 +380,6 @@ button:hover {
   align-items: center;
   gap: 12px;
   z-index: 1000;
-  min-height: 56px;
   box-sizing: border-box;
 }
 
@@ -228,7 +387,8 @@ button:hover {
 #bottom-nav #show-tasks-btn {
   flex: 1 1 0;
   min-width: 0;
-  height: 40px;
+  max-width: 180px;
+  height: 44px;
   background-color: transparent;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -236,6 +396,8 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #bottom-nav #home-btn:hover,
