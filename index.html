@@ -37,15 +37,38 @@
   <!-- Екран задач / Pomodoro -->
   <div class="container" id="tasks-container" style="display: none;">
     <!-- Pomodoro таймер по центру -->
-    <div id="pomodoro">
+    <div id="pomodoro-wrapper" style="display: inline-flex; align-items: flex-start; gap: 20px;">
+
+    <div id="pomodoro" style="position: relative;"> 
       <div>Задача: <span id="current-task">—</span></div>
       <div id="timer">25:00</div>
+      
+ <!-- === Наша крутилка Windows 98 === -->
+ <div class="win98-panel">
+  <div class="win98-crown-container">
+    <div class="win98-ridges"></div>
+  </div>
+</div>
+
       <div class="pomodoro-buttons">
         <button id="start-btn">Start</button>
+        <button id="pause-btn">Pause</button>
         <button id="stop-btn">Stop</button>
-        <button id="reset-btn">Reset</button>
       </div>
     </div>
+
+    <!-- Крутилка праворуч -->
+  <div id="knob-container">
+    <div id="knob">
+      <div class="tick"></div>
+      <div class="tick"></div>
+      <div class="tick"></div>
+      <div class="tick"></div>
+      <div class="tick"></div>
+    </div>
+  </div>
+</div>
+    
 
     <div class="task-input">
       <input type="text" id="new-task" placeholder="New task">
@@ -76,5 +99,8 @@
   </nav>
 
   <script src="app.js"></script>
+  
+  </body>
+
 </body>
 </html>

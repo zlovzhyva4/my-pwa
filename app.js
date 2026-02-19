@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentTaskEl = document.getElementById('current-task');
   const timerEl = document.getElementById('timer');
   const startBtn = document.getElementById('start-btn');
+  const pauseBtn = document.getElementById('pause-btn');
   const stopBtn = document.getElementById('stop-btn');
-  const resetBtn = document.getElementById('reset-btn');
 
   // === COINS ===
   const COINS_STORAGE_KEY = 'pwa-coins';
@@ -68,10 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (timeLeft <= 0) {
         clearInterval(timer);
         timer = null;
+
         tasks[selectedTaskIndex].timeSpent += 1;
-  saveTasks();
-  renderTasks();
-        alert('Pomodoro завершено 🍅');
+
+        // 👉 нарахування coins
+        const reward = tasks[selectedTaskIndex].coins || 0;
+        coins += reward;
+        saveCoins();
+
+        saveTasks();
+        renderTasks();
+        updateCoinsUI();
+
+        alert(`Pomodoro завершено (+${reward} coins)`);
       }
     }, 1000);
   }
@@ -88,6 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTimerUI();
   }
 
+  function showStartOnly() {
+    startBtn.style.display = 'inline-block';
+    pauseBtn.style.display = 'none';
+    stopBtn.style.display = 'none';
+  }
+
+  function showPauseAndStop() {
+    startBtn.style.display = 'none';
+    pauseBtn.style.display = 'inline-block';
+    stopBtn.style.display = 'inline-block';
+  }
+
   // === TASKS ===
   function renderTasks() {
     list.innerHTML = '';
@@ -98,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (task.done) li.classList.add('done');
       if (index === selectedTaskIndex) li.classList.add('selected');
 
-      // radio
       const radio = document.createElement('input');
       radio.type = 'radio';
       radio.name = 'selected-task';
@@ -111,48 +131,27 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTasks();
       });
 
-      // text
       const taskCoins = task.coins != null ? task.coins : 0;
+
       const span = document.createElement('span');
       span.className = 'task-text';
-      span.textContent = `${task.text} (${task.timeSpent} хв)${taskCoins ? ` · ${taskCoins} coin${taskCoins !== 1 ? 's' : ''}` : ''}`;
+      span.textContent = `${task.text} (${task.timeSpent} хв)${taskCoins ? ` · ${taskCoins} coin` : ''}`;
       span.style.flexGrow = '1';
 
-      // done
       const doneBtn = document.createElement('button');
-      doneBtn.type = 'button';
-      doneBtn.className = 'task-done-btn' + (task.done ? ' is-done' : '');
-      doneBtn.textContent = task.done ? '✓ Виконано' : 'Готово';
-      doneBtn.onclick = (e) => {
-        e.stopPropagation();
-        const wasDone = task.done;
+      doneBtn.textContent = task.done ? '✓' : 'OK';
+
+      doneBtn.onclick = () => {
         task.done = !task.done;
-        const alreadyAwarded = task.coinsAwarded === true;
-        if (!wasDone && task.done && !alreadyAwarded) {
-          const toAdd = task.coins != null ? task.coins : 0;
-          coins += toAdd;
-          task.coinsAwarded = true;
-          saveCoins();
-          updateCoinsUI();
-        }
         saveTasks();
         renderTasks();
       };
 
-      // remove
       const removeBtn = document.createElement('button');
       removeBtn.textContent = '−';
+
       removeBtn.onclick = () => {
         tasks.splice(index, 1);
-
-        if (selectedTaskIndex === index) {
-          selectedTaskIndex = null;
-          currentTaskEl.textContent = '—';
-          resetTimer();
-        } else if (selectedTaskIndex > index) {
-          selectedTaskIndex--;
-        }
-
         saveTasks();
         renderTasks();
       };
@@ -182,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input.value = '';
     coinsInput.value = '0';
+
     saveTasks();
     renderTasks();
   });
@@ -196,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     main.style.display = 'none';
     tasksScreen.style.display = 'none';
     learnScreen.style.display = 'block';
-    quizShowNextWord();
   });
 
   homeBtn.addEventListener('click', () => {
@@ -205,63 +204,80 @@ document.addEventListener('DOMContentLoaded', () => {
     main.style.display = 'block';
   });
 
-  startBtn.addEventListener('click', startTimer);
-  stopBtn.addEventListener('click', stopTimer);
-  resetBtn.addEventListener('click', resetTimer);
-
-  // === QUIZ (Learn) ===
-  let quizWords = [];
-  let quizCurrentIndex = 0;
-
-  const quizWordEl = document.getElementById('quiz-word');
-  const quizAnswerInput = document.getElementById('quiz-answer');
-  const quizCheckBtn = document.getElementById('quiz-check-btn');
-  const quizResultEl = document.getElementById('quiz-result');
-
-  async function quizLoadWords() {
-    try {
-      const res = await fetch('data/words.json');
-      const data = await res.json();
-      quizWords = data.words || [];
-    } catch (e) {
-      quizWords = [];
-      console.warn('Quiz: could not load words.json', e);
-    }
-  }
-
-  function quizShowNextWord() {
-    if (quizWords.length === 0) {
-      quizWordEl.textContent = '—';
-      quizResultEl.textContent = 'Немає слів. Додай data/words.json';
-      return;
-    }
-    quizCurrentIndex = Math.floor(Math.random() * quizWords.length);
-    const item = quizWords[quizCurrentIndex];
-    quizWordEl.textContent = item.question;
-    quizAnswerInput.value = '';
-    quizResultEl.textContent = '';
-    quizAnswerInput.focus();
-  }
-
-  function quizCheck() {
-    if (quizWords.length === 0) return;
-    const item = quizWords[quizCurrentIndex];
-    const userAnswer = (quizAnswerInput.value || '').trim();
-    const correct = item.answer.trim().toLowerCase() === userAnswer.toLowerCase();
-    quizResultEl.textContent = correct ? 'Correct!' : `Wrong. Correct: ${item.answer}`;
-    quizResultEl.className = 'quiz-result ' + (correct ? 'quiz-result-ok' : 'quiz-result-fail');
-    setTimeout(quizShowNextWord, 1500);
-  }
-
-  quizCheckBtn.addEventListener('click', quizCheck);
-  quizAnswerInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') quizCheck();
+  startBtn.addEventListener('click', () => {
+    startTimer();
+    showPauseAndStop();
   });
+
+  pauseBtn.addEventListener('click', () => {
+    stopTimer();
+    showStartOnly();
+  });
+
+  stopBtn.addEventListener('click', () => {
+    resetTimer();
+    showStartOnly();
+  });
+
+  // === КРУТИЛКА (ОНОВЛЕНО) ===
+const crownContainer = document.querySelector('.win98-crown-container');
+const ridges = document.querySelector('.win98-ridges');
+
+if (crownContainer && ridges) {
+    let currentY = 0;
+    let startY = 0;
+    const stepHeight = 5; // Висота однієї засічки в CSS
+
+    const updateRotation = (delta) => {
+        currentY += delta;
+        
+        // Використовуємо % щоб візуально зациклити рух градієнта
+        // 5 — це висота одного циклу градієнта в CSS
+        const visualOffset = currentY % stepHeight;
+        ridges.style.transform = `translateY(${visualOffset}px)`;
+
+        // Додатково: змінюємо час таймера залежно від прокрутки
+        if (Math.abs(currentY) >= stepHeight) {
+            const direction = currentY > 0 ? 1 : -1;
+            changeTimerValue(direction); 
+            currentY = 0; // Скидаємо після кожного "кроку"
+        }
+    };
+
+    // Функція для зміни часу таймера (наприклад, +1/-1 хвилина)
+    function changeTimerValue(direction) {
+        // Якщо таймер не запущений, дозволяємо крутити час
+        if (!timer) {
+            timeLeft += direction * 60;
+            if (timeLeft < 60) timeLeft = 60; // Мінімум 1 хвилина
+            updateTimerUI();
+        }
+    }
+
+    // Touch події
+    crownContainer.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    crownContainer.addEventListener('touchmove', (e) => {
+        const moveY = e.touches[0].clientY;
+        const delta = moveY - startY;
+        updateRotation(delta);
+        startY = moveY;
+    }, { passive: false }); // false дозволяє preventDefault, якщо треба
+
+    // Mouse wheel (наведення на коронку)
+    crownContainer.addEventListener('wheel', (e) => {
+        e.preventDefault(); // Забороняємо скрол сторінки
+        const delta = e.deltaY > 0 ? -5 : 5;
+        updateRotation(delta);
+    }, { passive: false });
+}
 
   // === INIT ===
   updateCoinsUI();
   renderTasks();
   updateTimerUI();
-  quizLoadWords();
+  showStartOnly();
 
 });
