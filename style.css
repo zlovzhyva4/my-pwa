@@ -76,14 +76,69 @@ button:hover {
 }
 
 /* === Контейнери сторінок === */
-#main-container, #tasks-container {
+#main-container, #tasks-container, #learn-container {
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
 }
 
-#tasks-container {
+#tasks-container,
+#learn-container {
   display: none; /* спочатку ховаємо */
+}
+
+/* === Learn: Quiz === */
+#learn-container #quiz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 16px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+#learn-container .quiz-word {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 0 16px;
+  min-height: 1.5em;
+}
+
+#learn-container .quiz-input {
+  width: 100%;
+  max-width: 240px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+#learn-container .quiz-input:focus {
+  border-color: #1e90ff;
+}
+
+#learn-container .quiz-check-btn {
+  padding: 10px 24px;
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+#learn-container .quiz-result {
+  font-size: 1rem;
+  margin: 0;
+  min-height: 1.5em;
+}
+
+#learn-container .quiz-result-ok {
+  color: #0a7c0a;
+}
+
+#learn-container .quiz-result-fail {
+  color: #c00;
 }
 
 #tasks-container #pomodoro {
@@ -384,7 +439,8 @@ button:hover {
 }
 
 #bottom-nav #home-btn,
-#bottom-nav #show-tasks-btn {
+#bottom-nav #show-tasks-btn,
+#bottom-nav #show-learn-btn {
   flex: 1 1 0;
   min-width: 0;
   max-width: 180px;
@@ -401,7 +457,8 @@ button:hover {
 }
 
 #bottom-nav #home-btn:hover,
-#bottom-nav #show-tasks-btn:hover {
+#bottom-nav #show-tasks-btn:hover,
+#bottom-nav #show-learn-btn:hover {
   background-color: rgba(255, 255, 255, 0.15);
 }
 

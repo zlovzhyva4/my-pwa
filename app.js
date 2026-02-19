@@ -10,8 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // === DOM ===
   const main = document.getElementById('main-container');
   const tasksScreen = document.getElementById('tasks-container');
+  const learnScreen = document.getElementById('learn-container');
 
   const showBtn = document.getElementById('show-tasks-btn');
+  const showLearnBtn = document.getElementById('show-learn-btn');
   const homeBtn = document.getElementById('home-btn');
 
   const input = document.getElementById('new-task');
@@ -186,11 +188,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showBtn.addEventListener('click', () => {
     main.style.display = 'none';
+    learnScreen.style.display = 'none';
     tasksScreen.style.display = 'block';
+  });
+
+  showLearnBtn.addEventListener('click', () => {
+    main.style.display = 'none';
+    tasksScreen.style.display = 'none';
+    learnScreen.style.display = 'block';
+    quizShowNextWord();
   });
 
   homeBtn.addEventListener('click', () => {
     tasksScreen.style.display = 'none';
+    learnScreen.style.display = 'none';
     main.style.display = 'block';
   });
 
@@ -198,9 +209,59 @@ document.addEventListener('DOMContentLoaded', () => {
   stopBtn.addEventListener('click', stopTimer);
   resetBtn.addEventListener('click', resetTimer);
 
+  // === QUIZ (Learn) ===
+  let quizWords = [];
+  let quizCurrentIndex = 0;
+
+  const quizWordEl = document.getElementById('quiz-word');
+  const quizAnswerInput = document.getElementById('quiz-answer');
+  const quizCheckBtn = document.getElementById('quiz-check-btn');
+  const quizResultEl = document.getElementById('quiz-result');
+
+  async function quizLoadWords() {
+    try {
+      const res = await fetch('data/words.json');
+      const data = await res.json();
+      quizWords = data.words || [];
+    } catch (e) {
+      quizWords = [];
+      console.warn('Quiz: could not load words.json', e);
+    }
+  }
+
+  function quizShowNextWord() {
+    if (quizWords.length === 0) {
+      quizWordEl.textContent = '—';
+      quizResultEl.textContent = 'Немає слів. Додай data/words.json';
+      return;
+    }
+    quizCurrentIndex = Math.floor(Math.random() * quizWords.length);
+    const item = quizWords[quizCurrentIndex];
+    quizWordEl.textContent = item.question;
+    quizAnswerInput.value = '';
+    quizResultEl.textContent = '';
+    quizAnswerInput.focus();
+  }
+
+  function quizCheck() {
+    if (quizWords.length === 0) return;
+    const item = quizWords[quizCurrentIndex];
+    const userAnswer = (quizAnswerInput.value || '').trim();
+    const correct = item.answer.trim().toLowerCase() === userAnswer.toLowerCase();
+    quizResultEl.textContent = correct ? 'Correct!' : `Wrong. Correct: ${item.answer}`;
+    quizResultEl.className = 'quiz-result ' + (correct ? 'quiz-result-ok' : 'quiz-result-fail');
+    setTimeout(quizShowNextWord, 1500);
+  }
+
+  quizCheckBtn.addEventListener('click', quizCheck);
+  quizAnswerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') quizCheck();
+  });
+
   // === INIT ===
   updateCoinsUI();
   renderTasks();
   updateTimerUI();
+  quizLoadWords();
 
 });

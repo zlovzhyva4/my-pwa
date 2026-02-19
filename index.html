@@ -58,10 +58,21 @@
     <ul id="tasks-list"></ul>
   </div>
 
+  <!-- Сторінка Learn / Quiz -->
+  <div class="container" id="learn-container" style="display: none;">
+    <div id="quiz">
+      <p id="quiz-word" class="quiz-word"></p>
+      <input type="text" id="quiz-answer" class="quiz-input" placeholder="Відповідь" autocomplete="off">
+      <button type="button" id="quiz-check-btn" class="quiz-check-btn">Check</button>
+      <p id="quiz-result" class="quiz-result" aria-live="polite"></p>
+    </div>
+  </div>
+
   <!-- Bottom Navigation (на всіх екранах) -->
   <nav id="bottom-nav">
     <button type="button" id="home-btn" aria-label="Головна">Home</button>
     <button type="button" id="show-tasks-btn" aria-label="Задачі">Tasks</button>
+    <button type="button" id="show-learn-btn" aria-label="Навчання">Learn</button>
   </nav>
 
   <script src="app.js"></script>

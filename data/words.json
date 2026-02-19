@@ -1,0 +1,9 @@
+{
+    "version": 1,
+    "words": [
+      { "question": "один", "answer": "1" },
+      { "question": "два", "answer": "2" },
+      { "question": "три", "answer": "3" },
+      { "question": "чотири", "answer": "4" }
+    ]
+  }  
