@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let timer = null;
   let timeLeft = 25 * 60;
 
+// ВСТАВЛЯЙ СЮДИ:
+const clickSound = new Audio("data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAAAACAAICAgICAgICA/v8AgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AAAAAA==");
+clickSound.volume = 0.5;
+
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
   // === DOM ===
@@ -51,6 +55,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const seconds = timeLeft % 60;
     timerEl.textContent =
       `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function playClick() {
+    clickSound.pause();
+    clickSound.currentTime = 0;
+    clickSound.play().catch(e => console.log("Sound blocked"));
+  }
+
+  function changeTimerValue(direction) {
+    if (!timer) {
+      timeLeft += direction * 60;
+      if (timeLeft < 60) timeLeft = 60; 
+      updateTimerUI();
+      playClick();
+      if (navigator.vibrate) navigator.vibrate(2);
+    }
   }
 
   function startTimer() {
@@ -279,35 +299,5 @@ if (crownContainer && ridges) {
   renderTasks();
   updateTimerUI();
   showStartOnly();
-
-  // === ЗВУК КЛІКУ (Windows 98 Style) ===
-// Це короткий звук механічного кліку в форматі Base64
-const clickSound = new Audio("data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAAAACAAICAgICAgICA/v8AgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AAAAAA==");
-clickSound.volume = 0.5; // Робимо не занадто гучним
-
-// Функція для відтворення звуку
-function playClick() {
-    // Скидаємо звук на початок, щоб він міг грати часто
-    clickSound.pause();
-    clickSound.currentTime = 0;
-    clickSound.play().catch(e => console.log("Sound blocked by browser"));
-}
-
-// === ОНОВЛЕНА ЛОГІКА ЗМІНИ ЧАСУ ===
-function changeTimerValue(direction) {
-    if (!timer) {
-        timeLeft += direction * 60;
-        if (timeLeft < 60) timeLeft = 60;
-        updateTimerUI();
-        
-        // Вмикаємо звук при кожному кроці!
-        playClick();
-        
-        // Також додаємо вібрацію для повного занурення
-        if (navigator.vibrate) {
-            navigator.vibrate(2); // Дуже короткий імпульс
-        }
-    }
-}
 
 });

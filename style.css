@@ -492,7 +492,7 @@ button:hover {
 
 /* === Оновлена крутилка Windows 98 === */
 .win98-crown-container {
-  width: 42px;
+  width: 25px;
   height: 80px;
   background: #c0c0c0;
   position: relative;
@@ -536,4 +536,29 @@ button:hover {
     transparent 80%,
     rgba(0,0,0,0.5) 100%
   );
+}
+
+/* Контейнер, який ставить ліву колонку та крутилку в ряд */
+.pomodoro-layout {
+  display: flex;
+  flex-direction: row; /* В ряд */
+  align-items: center; /* Центруємо по вертикалі */
+  justify-content: center;
+  gap: 25px; /* Відстань між кнопками та крутилкою */
+}
+
+/* Колонна для таймера та кнопок */
+.controls-column {
+  display: flex;
+  flex-direction: column; /* Елементи один під одним */
+  align-items: center;    /* Центруємо всередині колонки */
+  gap: 10px;
+}
+
+/* Додатково: трохи зменшимо кнопки, щоб вони гарно вписалися */
+#tasks-container #pomodoro .pomodoro-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Кнопки у два ряди або в ряд */
+  gap: 5px;
+  margin-top: 5px;
 }
