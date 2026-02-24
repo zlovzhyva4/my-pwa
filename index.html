@@ -37,41 +37,28 @@
   <!-- Екран задач / Pomodoro -->
   <div class="container" id="tasks-container" style="display: none;">
     <!-- Pomodoro таймер по центру -->
-    <div id="pomodoro-wrapper" style="display: inline-flex; align-items: flex-start; gap: 20px;">
-
-      <div id="pomodoro">
-        <div class="pomodoro-layout">
+    <div id="pomodoro">
+      <div class="pomodoro-layout">
+        
+        <div class="controls-column">
+          <div>Задача: <span id="current-task">—</span></div>
+          <div id="timer">25:00</div>
           
-          <div class="controls-column">
-            <div>Задача: <span id="current-task">—</span></div>
-            <div id="timer">25:00</div>
-            
-            <div class="pomodoro-buttons">
-              <button id="start-btn">Start</button>
-              <button id="pause-btn">Pause</button>
-              <button id="stop-btn">Stop</button>
-            </div>
+          <div class="pomodoro-buttons">
+            <button id="start-btn">Start</button>
+            <button id="pause-btn">Pause</button>
+            <button id="stop-btn">Stop</button>
           </div>
-      
-          <div class="win98-panel">
-            <div class="win98-crown-container">
-              <div class="win98-ridges"></div>
-            </div>
-          </div>
-      
         </div>
+    
+        <div class="win98-panel">
+          <div class="win98-crown-container">
+            <div class="win98-ridges"></div>
+          </div>
+        </div>
+    
       </div>
-    <!-- Крутилка праворуч -->
-  <div id="knob-container">
-    <div id="knob">
-      <div class="tick"></div>
-      <div class="tick"></div>
-      <div class="tick"></div>
-      <div class="tick"></div>
-      <div class="tick"></div>
     </div>
-  </div>
-</div>
     
 
     <div class="task-input">
