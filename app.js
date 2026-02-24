@@ -30,6 +30,8 @@ clickSound.volume = 0.5;
   const startBtn = document.getElementById('start-btn');
   const pauseBtn = document.getElementById('pause-btn');
   const stopBtn = document.getElementById('stop-btn');
+  const crownContainer = document.querySelector('.win98-crown-container');
+  const ridges = document.querySelector('.win98-ridges');
 
   // === COINS ===
   const COINS_STORAGE_KEY = 'pwa-coins';
@@ -67,9 +69,10 @@ clickSound.volume = 0.5;
     if (!timer) {
       timeLeft += direction * 60;
       if (timeLeft < 60) timeLeft = 60; 
+      if (timeLeft > 60 * 60) timeLeft = 60 * 60; // Максимум 60 хвилин
       updateTimerUI();
       playClick();
-      if (navigator.vibrate) navigator.vibrate(2);
+      if (navigator.vibrate) navigator.vibrate(15);
     }
   }
 
@@ -80,6 +83,7 @@ clickSound.volume = 0.5;
       alert('Спочатку вибери задачу');
       return;
     }
+    if (crownContainer) crownContainer.classList.add('disabled');
 
     timer = setInterval(() => {
       timeLeft--;
@@ -108,12 +112,14 @@ clickSound.volume = 0.5;
   function stopTimer() {
     clearInterval(timer);
     timer = null;
+    if (crownContainer) crownContainer.classList.remove('disabled');
   }
 
   function resetTimer() {
     clearInterval(timer);
     timer = null;
     timeLeft = 25 * 60;
+    if (crownContainer) crownContainer.classList.remove('disabled');
     updateTimerUI();
   }
 
@@ -240,15 +246,17 @@ clickSound.volume = 0.5;
   });
 
   // === КРУТИЛКА (ОНОВЛЕНО) ===
-const crownContainer = document.querySelector('.win98-crown-container');
-const ridges = document.querySelector('.win98-ridges');
-
 if (crownContainer && ridges) {
     let currentY = 0;
     let startY = 0;
+    let isDragging = false;
     const stepHeight = 5; // Висота однієї засічки в CSS
 
     const updateRotation = (delta) => {
+        // Зупиняємо анімацію, якщо вперлися в ліміти (60с або 60хв)
+        if (timeLeft >= 3600 && delta > 0 && currentY >= 0) return;
+        if (timeLeft <= 60 && delta < 0 && currentY <= 0) return;
+
         currentY += delta;
         
         // Використовуємо % щоб візуально зациклити рух градієнта
@@ -264,27 +272,37 @@ if (crownContainer && ridges) {
         }
     };
 
-    // Функція для зміни часу таймера (наприклад, +1/-1 хвилина)
-    function changeTimerValue(direction) {
-        // Якщо таймер не запущений, дозволяємо крутити час
-        if (!timer) {
-            timeLeft += direction * 60;
-            if (timeLeft < 60) timeLeft = 60; // Мінімум 1 хвилина
-            updateTimerUI();
-        }
-    }
-
     // Touch події
     crownContainer.addEventListener('touchstart', (e) => {
         startY = e.touches[0].clientY;
+        if (navigator.vibrate) navigator.vibrate(10);
     }, { passive: true });
 
     crownContainer.addEventListener('touchmove', (e) => {
         const moveY = e.touches[0].clientY;
-        const delta = moveY - startY;
+        const delta = startY - moveY; // Інвертуємо: рух вниз зменшує значення
         updateRotation(delta);
         startY = moveY;
     }, { passive: false }); // false дозволяє preventDefault, якщо треба
+
+    // Mouse події (для комп'ютера)
+    crownContainer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startY = e.clientY;
+        e.preventDefault(); // Щоб не виділявся текст
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const moveY = e.clientY;
+        const delta = startY - moveY;
+        updateRotation(delta);
+        startY = moveY;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
 
     // Mouse wheel (наведення на коронку)
     crownContainer.addEventListener('wheel', (e) => {
