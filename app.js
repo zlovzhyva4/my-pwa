@@ -6,8 +6,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let timeLeft = 25 * 60;
 
 // ВСТАВЛЯЙ СЮДИ:
-const clickSound = new Audio("data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAAAACAAICAgICAgICA/v8AgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AAAAAA==");
-clickSound.volume = 0.5;
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+let clickBuffer = null;
+const soundBase64 = "data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YTAAAACAAICAgICAgICA/v8AgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AIAAgP7/AAAAAA==";
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new AudioContext();
+    // Декодуємо аудіо дані один раз для високої продуктивності
+    fetch(soundBase64)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      .then(decodedData => {
+        clickBuffer = decodedData;
+      })
+      .catch(e => console.error("Failed to decode audio data", e));
+  } catch (e) {
+    console.error("Web Audio API is not supported in this browser", e);
+  }
+}
 
   let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
@@ -60,9 +79,24 @@ clickSound.volume = 0.5;
   }
 
   function playClick() {
-    clickSound.pause();
-    clickSound.currentTime = 0;
-    clickSound.play().catch(e => console.log("Sound blocked"));
+    if (!audioCtx || !clickBuffer) {
+      return;
+    }
+
+    // Політика браузерів вимагає "прокидати" контекст після дій користувача
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const source = audioCtx.createBufferSource();
+    source.buffer = clickBuffer;
+
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Гучність 0.5
+
+    source.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    source.start(0);
   }
 
   function changeTimerValue(direction) {
@@ -135,6 +169,32 @@ clickSound.volume = 0.5;
     stopBtn.style.display = 'inline-block';
   }
 
+  // === АНІМАЦІЯ МОНЕТКИ ===
+  function animateCoin(startX, startY) {
+    const coin = document.createElement('div');
+    coin.className = 'flying-coin';
+    coin.textContent = '🪙'; // Можна замінити на картинку
+    document.body.appendChild(coin);
+
+    // Початкова позиція (там де клікнули)
+    coin.style.transform = `translate(${startX}px, ${startY}px)`;
+
+    // Цільова позиція (контейнер з монетами)
+    const targetRect = document.getElementById('coins-container').getBoundingClientRect();
+    const targetX = targetRect.left + (targetRect.width / 2) - 12; // -12 для центрування (половина розміру)
+    const targetY = targetRect.top + (targetRect.height / 2) - 12;
+
+    // Запускаємо анімацію в наступному кадрі
+    requestAnimationFrame(() => {
+      coin.style.transform = `translate(${targetX}px, ${targetY}px) scale(0.5)`;
+      coin.style.opacity = '0';
+    });
+
+    coin.addEventListener('transitionend', () => {
+      coin.remove();
+    });
+  }
+
   // === TASKS ===
   function renderTasks() {
     list.innerHTML = '';
@@ -167,8 +227,19 @@ clickSound.volume = 0.5;
       const doneBtn = document.createElement('button');
       doneBtn.textContent = task.done ? '✓' : 'OK';
 
-      doneBtn.onclick = () => {
+      doneBtn.onclick = (e) => {
         task.done = !task.done;
+
+        const reward = task.coins || 0;
+        if (task.done) {
+          coins += reward;
+          animateCoin(e.clientX, e.clientY);
+        } else {
+          coins = Math.max(0, coins - reward);
+        }
+        saveCoins();
+        updateCoinsUI();
+
         saveTasks();
         renderTasks();
       };
@@ -274,6 +345,7 @@ if (crownContainer && ridges) {
 
     // Touch події
     crownContainer.addEventListener('touchstart', (e) => {
+        initAudio(); // Ініціалізуємо аудіо при першому дотику
         startY = e.touches[0].clientY;
         if (navigator.vibrate) navigator.vibrate(10);
     }, { passive: true });
@@ -287,6 +359,7 @@ if (crownContainer && ridges) {
 
     // Mouse події (для комп'ютера)
     crownContainer.addEventListener('mousedown', (e) => {
+        initAudio(); // Ініціалізуємо аудіо при першому кліку
         isDragging = true;
         startY = e.clientY;
         e.preventDefault(); // Щоб не виділявся текст
