@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedTaskIndex = null;
   let timer = null;
   let timeLeft = 25 * 60;
+  let endTime = null;
 
 // ВСТАВЛЯЙ СЮДИ:
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -119,11 +120,15 @@ function initAudio() {
     }
     if (crownContainer) crownContainer.classList.add('disabled');
 
-    timer = setInterval(() => {
-      timeLeft--;
-      updateTimerUI();
+    endTime = Date.now() + timeLeft * 1000;
 
-      if (timeLeft <= 0) {
+    timer = setInterval(() => {
+      const now = Date.now();
+      const diff = Math.ceil((endTime - now) / 1000);
+
+      if (diff <= 0) {
+        timeLeft = 0;
+        updateTimerUI();
         clearInterval(timer);
         timer = null;
 
@@ -139,8 +144,11 @@ function initAudio() {
         updateCoinsUI();
 
         alert(`Pomodoro завершено (+${reward} coins)`);
+      } else {
+        timeLeft = diff;
+        updateTimerUI();
       }
-    }, 1000);
+    }, 200);
   }
 
   function stopTimer() {
