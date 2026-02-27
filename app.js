@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedTaskIndex = null;
   let timer = null;
   let timeLeft = 25 * 60;
+  let initialDuration = timeLeft;
   let endTime = null;
 
 // ВСТАВЛЯЙ СЮДИ:
@@ -100,11 +101,38 @@ function initAudio() {
     source.start(0);
   }
 
+  function playAlarm() {
+    if (!audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    const now = audioCtx.currentTime;
+    
+    // Генеруємо 3 коротких сигнали
+    for (let i = 0; i < 3; i++) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'sine'; // Синусоїда (м'який звук)
+      osc.frequency.setValueAtTime(880, now + i * 0.5); // Нота A5
+      
+      gain.gain.setValueAtTime(0, now + i * 0.5);
+      gain.gain.linearRampToValueAtTime(0.3, now + i * 0.5 + 0.05);
+      gain.gain.linearRampToValueAtTime(0, now + i * 0.5 + 0.3);
+      
+      osc.start(now + i * 0.5);
+      osc.stop(now + i * 0.5 + 0.3);
+    }
+  }
+
   function changeTimerValue(direction) {
     if (!timer) {
       timeLeft += direction * 60;
       if (timeLeft < 60) timeLeft = 60; 
       if (timeLeft > 60 * 60) timeLeft = 60 * 60; // Максимум 60 хвилин
+      initialDuration = timeLeft;
       updateTimerUI();
       playClick();
       if (navigator.vibrate) navigator.vibrate(15);
@@ -132,7 +160,8 @@ function initAudio() {
         clearInterval(timer);
         timer = null;
 
-        tasks[selectedTaskIndex].timeSpent += 1;
+        playAlarm();
+        tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
 
         // 👉 нарахування coins
         const reward = tasks[selectedTaskIndex].coins || 0;
@@ -142,8 +171,6 @@ function initAudio() {
         saveTasks();
         renderTasks();
         updateCoinsUI();
-
-        alert(`Pomodoro завершено (+${reward} coins)`);
       } else {
         timeLeft = diff;
         updateTimerUI();
@@ -161,6 +188,7 @@ function initAudio() {
     clearInterval(timer);
     timer = null;
     timeLeft = 25 * 60;
+    initialDuration = timeLeft;
     if (crownContainer) crownContainer.classList.remove('disabled');
     updateTimerUI();
   }
@@ -310,6 +338,7 @@ function initAudio() {
   });
 
   startBtn.addEventListener('click', () => {
+    initAudio(); // Активуємо аудіо контекст при старті
     startTimer();
     showPauseAndStop();
   });
