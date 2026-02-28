@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let timeLeft = 25 * 60;
   let initialDuration = timeLeft;
   let endTime = null;
+  let isRestMode = false;
 
 // ВСТАВЛЯЙ СЮДИ:
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -53,6 +54,7 @@ function initAudio() {
 
   const currentTaskEl = document.getElementById('current-task');
   const timerEl = document.getElementById('timer');
+  const progressBar = document.getElementById('progress-bar');
   const startBtn = document.getElementById('start-btn');
   const pauseBtn = document.getElementById('pause-btn');
   const stopBtn = document.getElementById('stop-btn');
@@ -83,6 +85,16 @@ function initAudio() {
     const seconds = timeLeft % 60;
     timerEl.textContent =
       `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    // Візуальна індикація: червоний - робота, зелений - відпочинок
+    timerEl.style.color = isRestMode ? '#008000' : '#cc0000';
+
+    // Оновлення прогрес-бару
+    if (progressBar) {
+      const percent = initialDuration > 0 ? (timeLeft / initialDuration) * 100 : 0;
+      progressBar.style.width = `${percent}%`;
+      progressBar.style.backgroundColor = isRestMode ? '#008000' : '#0a246a';
+    }
   }
 
   function playClick() {
@@ -160,22 +172,29 @@ function initAudio() {
       const diff = Math.ceil((endTime - now) / 1000);
 
       if (diff <= 0) {
-        timeLeft = 0;
-        updateTimerUI();
-        clearInterval(timer);
-        timer = null;
-
         playAlarm();
-        tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
 
-        // 👉 нарахування coins
-        const reward = tasks[selectedTaskIndex].coins || 0;
-        coins += reward;
-        saveCoins();
+        if (!isRestMode) {
+          // === РОБОТА ЗАВЕРШЕНА ===
+          tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
+          const reward = tasks[selectedTaskIndex].coins || 0;
+          coins += reward;
+          saveCoins();
+          saveTasks();
+          renderTasks();
+          updateCoinsUI();
 
-        saveTasks();
-        renderTasks();
-        updateCoinsUI();
+          // Автоматичний старт відпочинку (5 хв)
+          isRestMode = true;
+          timeLeft = 5 * 60;
+          initialDuration = timeLeft;
+          endTime = Date.now() + timeLeft * 1000;
+          updateTimerUI();
+        } else {
+          // === ВІДПОЧИНОК ЗАВЕРШЕНО ===
+          resetTimer();
+          showStartOnly();
+        }
       } else {
         timeLeft = diff;
         updateTimerUI();
@@ -192,6 +211,7 @@ function initAudio() {
   function resetTimer() {
     clearInterval(timer);
     timer = null;
+    isRestMode = false;
     timeLeft = 25 * 60;
     initialDuration = timeLeft;
     if (crownContainer) crownContainer.classList.remove('disabled');
