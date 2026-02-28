@@ -11,19 +11,16 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  overscroll-behavior: none;
+  overflow: hidden; /* Забороняємо скрол всього вікна */
+  position: fixed; /* Жорстка фіксація для iOS, щоб прибрати bounce */
 }
 
 body {
   background-color: #c3c3c3;
   margin: 0;
-  padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* місце для Bottom Navigation + safe area */
   font-family: 'TahomaCustom', Tahoma, sans-serif;
   font-size: 8px;
   color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Заголовки */
@@ -79,7 +76,13 @@ button:hover {
 /* === Контейнери сторінок === */
 #main-container, #tasks-container, #learn-container {
   width: 100%;
+  height: 100%; /* На всю висоту екрана */
+  overflow-y: auto; /* Скрол всередині контейнера */
+  overscroll-behavior-y: none; /* Вимикаємо bounce всередині контейнера */
+  -webkit-overflow-scrolling: touch; /* Плавний скрол на iOS */
   padding: 20px;
+  padding-top: calc(120px + env(safe-area-inset-top)); /* Відступ зверху під Аватар */
+  padding-bottom: calc(80px + env(safe-area-inset-bottom)); /* Відступ знизу під Меню */
   box-sizing: border-box;
 }
 
