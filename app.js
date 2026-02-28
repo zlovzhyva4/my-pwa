@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // === ORIENTATION LOCK (Спроба заблокувати поворот) ===
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('portrait').catch(e => console.log('Orientation lock failed (потрібен встановлений PWA):', e));
+  }
+
   // === СТАН ===
   let selectedTaskIndex = null;
   let timer = null;
