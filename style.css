@@ -586,3 +586,9 @@ button:hover {
   pointer-events: none;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in;
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
