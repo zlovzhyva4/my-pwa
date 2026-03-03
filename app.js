@@ -54,11 +54,8 @@ function initAudio() {
   // === DOM ===
   const main = document.getElementById('main-container');
   const tasksScreen = document.getElementById('tasks-container');
-  const learnScreen = document.getElementById('learn-container');
 
   const showBtn = document.getElementById('show-tasks-btn');
-  const showLearnBtn = document.getElementById('show-learn-btn');
-  const homeBtn = document.getElementById('home-btn');
 
   const input = document.getElementById('new-task');
   const coinsInput = document.getElementById('new-task-coins');
@@ -131,44 +128,6 @@ function initAudio() {
     source.start(0);
   }
 
-  function playAlarm() {
-    if (!audioCtx) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    const now = audioCtx.currentTime;
-    
-    // Генеруємо 3 коротких сигнали
-    for (let i = 0; i < 3; i++) {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      
-      osc.type = 'sine'; // Синусоїда (м'який звук)
-      osc.frequency.setValueAtTime(880, now + i * 0.5); // Нота A5
-      
-      gain.gain.setValueAtTime(0, now + i * 0.5);
-      gain.gain.linearRampToValueAtTime(0.3, now + i * 0.5 + 0.05);
-      gain.gain.linearRampToValueAtTime(0, now + i * 0.5 + 0.3);
-      
-      osc.start(now + i * 0.5);
-      osc.stop(now + i * 0.5 + 0.3);
-    }
-  }
-
-  function sendNotification(title, body) {
-    // Використовуємо Service Worker для показу сповіщень
-    if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification(title, {
-          body: body,
-          icon: 'images/icon-180.png'
-        });
-      });
-    }
-  }
-
   function changeTimerValue(direction) {
     if (!timer) {
       timeLeft += direction * 60;
@@ -201,10 +160,7 @@ localStorage.setItem('isRestMode', isRestMode);
       const diff = Math.ceil((endTime - now) / 1000);
 
       if (diff <= 0) {
-        playAlarm();
-
         if (!isRestMode) {
-          sendNotification('Робота завершена!', 'Час відпочити.');
           // === РОБОТА ЗАВЕРШЕНА ===
           tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
           const reward = tasks[selectedTaskIndex].coins || 0;
@@ -221,7 +177,6 @@ localStorage.setItem('isRestMode', isRestMode);
           endTime = Date.now() + timeLeft * 1000;
           updateTimerUI();
         } else {
-          sendNotification('Відпочинок завершено!', 'Пора до роботи.');
           // === ВІДПОЧИНОК ЗАВЕРШЕНО ===
           resetTimer();
           showStartOnly();
@@ -378,29 +333,8 @@ localStorage.removeItem('isRestMode');
     renderTasks();
   });
 
-  showBtn.addEventListener('click', () => {
-    main.style.display = 'none';
-    learnScreen.style.display = 'none';
-    tasksScreen.style.display = 'block';
-  });
-
-  showLearnBtn.addEventListener('click', () => {
-    main.style.display = 'none';
-    tasksScreen.style.display = 'none';
-    learnScreen.style.display = 'block';
-  });
-
-  homeBtn.addEventListener('click', () => {
-    tasksScreen.style.display = 'none';
-    learnScreen.style.display = 'none';
-    main.style.display = 'block';
-  });
-
   startBtn.addEventListener('click', () => {
     initAudio(); // Активуємо аудіо контекст при старті
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
     startTimer();
     showPauseAndStop();
   });
@@ -484,50 +418,11 @@ if (crownContainer && ridges) {
     }, { passive: false });
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && timer && endTime) {
-    if (Date.now() >= endTime) {
-      clearInterval(timer);
-      timer = null;
-      playAlarm();
-      sendNotification('🍅 Помодоро завершено!', 'Час відпочити!');
-
-      tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
-      const reward = tasks[selectedTaskIndex].coins || 0;
-      coins += reward;
-      saveCoins();
-      saveTasks();
-      renderTasks();
-      updateCoinsUI();
-
-      isRestMode = true;
-      timeLeft = 5 * 60;
-      initialDuration = timeLeft;
-      endTime = Date.now() + timeLeft * 1000;
-      localStorage.setItem('endTime', endTime);
-      localStorage.setItem('isRestMode', isRestMode);
-
-      timer = setInterval(() => {
-        const now = Date.now();
-        const diff = Math.ceil((endTime - now) / 1000);
-        if (diff <= 0) {
-          sendNotification('✅ Відпочинок завершено!', 'Пора до роботи.');
-          resetTimer();
-          showStartOnly();
-        } else {
-          timeLeft = diff;
-          updateTimerUI();
-        }
-      }, 200);
-
-      updateTimerUI();
-    }
-  }
-});
   // === INIT ===
   updateCoinsUI();
   renderTasks();
   updateTimerUI();
   showStartOnly();
+  tasksScreen.style.display = 'block';
 
 });

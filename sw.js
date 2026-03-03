@@ -10,32 +10,31 @@ const urlsToCache = [
   './fonts/Tahoma.woff2'
 ];
 
-// Обробник 'install' для кешування основних ресурсів
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// Обробник 'fetch' для видачі ресурсів з кешу
+// ДОДАНО: активація
+self.addEventListener('activate', event => {
+  event.waitUntil(clients.claim());
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
 
-// Обробник 'push' для показу сповіщень
-self.addEventListener('push', event => {
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'Щось трапилось';
-  const options = {
-    body: data.body || 'Натисніть, щоб перевірити.',
-    icon: './images/icon-180.png',
-    badge: './images/icon-180.png'
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
+// ДОДАНО: клік по сповіщенню відкриває додаток
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(clientList => {
+      if (clientList.length > 0) return clientList[0].focus();
+      return clients.openWindow('/');
+    })
+  );
 });
