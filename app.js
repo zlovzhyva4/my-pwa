@@ -1,5 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // === РЕЄСТРАЦІЯ SERVICE WORKER ===
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('Service Worker зареєстровано:', registration);
+        })
+        .catch(registrationError => {
+          console.log('Помилка реєстрації Service Worker:', registrationError);
+        });
+    });
+  }
+
   // === ORIENTATION LOCK (Спроба заблокувати поворот) ===
   if (screen.orientation && screen.orientation.lock) {
     screen.orientation.lock('portrait').catch(e => console.log('Orientation lock failed (потрібен встановлений PWA):', e));
@@ -145,8 +158,14 @@ function initAudio() {
   }
 
   function sendNotification(title, body) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, { body });
+    // Використовуємо Service Worker для показу сповіщень
+    if ('Notification' in window && Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification(title, {
+          body: body,
+          icon: 'images/icon-180.png'
+        });
+      });
     }
   }
 
