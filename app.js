@@ -144,6 +144,12 @@ function initAudio() {
     }
   }
 
+  function sendNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body });
+    }
+  }
+
   function changeTimerValue(direction) {
     if (!timer) {
       timeLeft += direction * 60;
@@ -175,6 +181,7 @@ function initAudio() {
         playAlarm();
 
         if (!isRestMode) {
+          sendNotification('Робота завершена!', 'Час відпочити.');
           // === РОБОТА ЗАВЕРШЕНА ===
           tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
           const reward = tasks[selectedTaskIndex].coins || 0;
@@ -191,6 +198,7 @@ function initAudio() {
           endTime = Date.now() + timeLeft * 1000;
           updateTimerUI();
         } else {
+          sendNotification('Відпочинок завершено!', 'Пора до роботи.');
           // === ВІДПОЧИНОК ЗАВЕРШЕНО ===
           resetTimer();
           showStartOnly();
@@ -364,6 +372,9 @@ function initAudio() {
 
   startBtn.addEventListener('click', () => {
     initAudio(); // Активуємо аудіо контекст при старті
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
     startTimer();
     showPauseAndStop();
   });
