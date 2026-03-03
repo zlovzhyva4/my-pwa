@@ -486,9 +486,41 @@ if (crownContainer && ridges) {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && timer && endTime) {
-    const now = Date.now();
-    if (now >= endTime) {
-      timeLeft = 0;
+    if (Date.now() >= endTime) {
+      clearInterval(timer);
+      timer = null;
+      playAlarm();
+      sendNotification('🍅 Помодоро завершено!', 'Час відпочити!');
+
+      tasks[selectedTaskIndex].timeSpent += Math.round(initialDuration / 60);
+      const reward = tasks[selectedTaskIndex].coins || 0;
+      coins += reward;
+      saveCoins();
+      saveTasks();
+      renderTasks();
+      updateCoinsUI();
+
+      isRestMode = true;
+      timeLeft = 5 * 60;
+      initialDuration = timeLeft;
+      endTime = Date.now() + timeLeft * 1000;
+      localStorage.setItem('endTime', endTime);
+      localStorage.setItem('isRestMode', isRestMode);
+
+      timer = setInterval(() => {
+        const now = Date.now();
+        const diff = Math.ceil((endTime - now) / 1000);
+        if (diff <= 0) {
+          sendNotification('✅ Відпочинок завершено!', 'Пора до роботи.');
+          resetTimer();
+          showStartOnly();
+        } else {
+          timeLeft = diff;
+          updateTimerUI();
+        }
+      }, 200);
+
+      updateTimerUI();
     }
   }
 });
