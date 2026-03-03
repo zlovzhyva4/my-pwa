@@ -192,6 +192,10 @@ function initAudio() {
 
     endTime = Date.now() + timeLeft * 1000;
 
+    localStorage.setItem('endTime', endTime);
+localStorage.setItem('isRestMode', isRestMode);
+    
+
     timer = setInterval(() => {
       const now = Date.now();
       const diff = Math.ceil((endTime - now) / 1000);
@@ -243,6 +247,9 @@ function initAudio() {
     initialDuration = timeLeft;
     if (crownContainer) crownContainer.classList.remove('disabled');
     updateTimerUI();
+
+    localStorage.removeItem('endTime');
+localStorage.removeItem('isRestMode');
   }
 
   function showStartOnly() {
@@ -477,6 +484,14 @@ if (crownContainer && ridges) {
     }, { passive: false });
 }
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && timer && endTime) {
+    const now = Date.now();
+    if (now >= endTime) {
+      timeLeft = 0;
+    }
+  }
+});
   // === INIT ===
   updateCoinsUI();
   renderTasks();
