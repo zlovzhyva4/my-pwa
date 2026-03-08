@@ -303,10 +303,24 @@ localStorage.removeItem('isRestMode');
         renderTasks();
       };
 
-      li.appendChild(radio);
-      li.appendChild(span);
-      li.appendChild(doneBtn);
-      li.appendChild(removeBtn);
+      const taskProgressContainer = document.createElement('div');
+      taskProgressContainer.className = 'task-progress-container';
+
+      const taskProgressFill = document.createElement('div');
+      taskProgressFill.className = 'task-progress-fill';
+      taskProgressFill.style.width = `${Math.min((task.timeSpent / 480) * 100, 100)}%`;
+
+      taskProgressContainer.appendChild(taskProgressFill);
+
+const taskRow = document.createElement('div');
+taskRow.className = 'task-row';
+taskRow.appendChild(radio);
+taskRow.appendChild(span);
+taskRow.appendChild(doneBtn);
+taskRow.appendChild(removeBtn);
+
+li.appendChild(taskRow);
+li.appendChild(taskProgressContainer);
 
       list.appendChild(li);
     });
